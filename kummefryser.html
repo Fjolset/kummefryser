@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <title>Kummefryser Overblik</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f5f7fa; padding: 20px; }
+    h1 { text-align: center; }
+    .freezer { max-width: 600px; margin: 0 auto; padding: 20px; }
+    svg { margin-bottom: 12px; width: 100%; }
+    .sections { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .section { background: #fff; border: 2px solid #cbd5e1; border-radius: 12px; padding: 10px; }
+    .section h2 { margin-top: 0; font-size: 1rem; }
+    ul { padding-left: 18px; }
+    li { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    button { margin-left: 8px; cursor: pointer; }
+    .add { margin-top: 8px; display: flex; gap: 6px; }
+    input { flex: 1; }
+  </style>
+</head>
+<body>
+
+<h1>🧊 Kummefryser</h1>
+<div class="freezer">
+  <svg viewBox="0 0 400 100">
+    <rect x="5" y="10" width="390" height="80" rx="20" fill="#e5e7eb" stroke="#9ca3af" stroke-width="4" />
+    <line x1="140" y1="10" x2="140" y2="90" stroke="#9ca3af" stroke-width="3" />
+    <line x1="280" y1="10" x2="280" y2="90" stroke="#9ca3af" stroke-width="3" />
+    <text x="70" y="50" text-anchor="middle" font-size="12">1</text>
+    <text x="210" y="50" text-anchor="middle" font-size="12">2</text>
+    <text x="350" y="50" text-anchor="middle" font-size="12">3</text>
+  </svg>
+
+  <div class="sections">
+    <div class="section" data-section="1">
+      <h2>Stort rum 1</h2>
+      <ul></ul>
+      <div class="add">
+        <input type="text" placeholder="Tilføj produkt" onkeydown="handleEnter(event)">
+        <button onclick="addItem(1)">Tilføj</button>
+      </div>
+    </div>
+
+    <div class="section" data-section="2">
+      <h2>Stort rum 2</h2>
+      <ul></ul>
+      <div class="add">
+        <input type="text" placeholder="Tilføj produkt" onkeydown="handleEnter(event)">
+        <button onclick="addItem(2)">Tilføj</button>
+      </div>
+    </div>
+
+    <div class="section" data-section="3">
+      <h2>Lille rum</h2>
+      <ul></ul>
+      <div class="add">
+        <input type="text" placeholder="Tilføj produkt" onkeydown="handleEnter(event)">
+        <button onclick="addItem(3)">Tilføj</button>
+      </div>
+    </div>
+
+    <div class="section" data-section="4">
+      <h2>Kurv 1</h2>
+      <ul></ul>
+      <div class="add">
+        <input type="text" placeholder="Tilføj produkt" onkeydown="handleEnter(event)">
+        <button onclick="addItem(4)">Tilføj</button>
+      </div>
+    </div>
+
+    <div class="section" data-section="5">
+      <h2>Kurv 2</h2>
+      <ul></ul>
+      <div class="add">
+        <input type="text" placeholder="Tilføj produkt" onkeydown="handleEnter(event)">
+        <button onclick="addItem(5)">Tilføj</button>
+      </div>
+    </div>
+
+    <div class="section" data-section="6">
+      <h2>Kurv 3</h2>
+      <ul></ul>
+      <div class="add">
+        <input type="text" placeholder="Tilføj produkt" onkeydown="handleEnter(event)">
+        <button onclick="addItem(6)">Tilføj</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function handleEnter(event) {
+  if (event.key === 'Enter') {
+    const section = event.target.closest('.section');
+    addItem(section.dataset.section);
+  }
+}
+
+function createListItem(ul, value) {
+  const li = document.createElement('li');
+  const span = document.createElement('span');
+  span.textContent = value;
+
+  const deleteBtn = document.createElement('button');
+  deleteBtn.textContent = '❌';
+  deleteBtn.onclick = () => {
+    li.remove();
+    saveData();
+  };
+
+  li.appendChild(span);
+  li.appendChild(deleteBtn);
+  ul.appendChild(li);
+}
+
+function addItem(sectionNumber) {
+  const section = document.querySelector(`.section[data-section="${sectionNumber}"]`);
+  const input = section.querySelector('input');
+  const ul = section.querySelector('ul');
+  const value = input.value.trim();
+  if (!value) return;
+
+  createListItem(ul, value);
+  input.value = '';
+  saveData();
+}
+
+function saveData() {
+  const data = {};
+  document.querySelectorAll('.section').forEach(section => {
+    const id = section.dataset.section;
+    data[id] = Array.from(section.querySelectorAll('li span')).map(span => span.textContent);
+  });
+  localStorage.setItem('kummefryser-data', JSON.stringify(data));
+}
+
+function loadData() {
+  const data = JSON.parse(localStorage.getItem('kummefryser-data') || '{}');
+  Object.keys(data).forEach(section => {
+    const ul = document.querySelector(`.section[data-section="${section}"] ul`);
+    data[section].forEach(item => createListItem(ul, item));
+  });
+}
+
+loadData();
+</script>
+
+</body>
+</html>
